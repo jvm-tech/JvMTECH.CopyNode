@@ -1,0 +1,11 @@
+privilegeTargets:
+  Neos\Neos\Security\Authorization\Privilege\ModulePrivilege:
+    JvMTECH.CopyNode:Backend.Module:
+      matcher: 'management/copynode'
+
+roles:
+  Neos.Neos:Editor:
+    privileges:
+      -
+        privilegeTarget: 'JvMTECH.CopyNode:Backend.Module'
+        permission: GRANT

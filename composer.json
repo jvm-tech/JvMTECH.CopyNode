@@ -1,0 +1,21 @@
+{
+    "name": "jvmtech/copynode",
+    "description": "Copy nodes recursive with dimensions",
+    "type": "neos-package",
+    "authors": [
+        {
+            "name": "Samuel Hauser",
+            "email": "samuel.hauser@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "JvMTECH\\CopyNode\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "JvMTECH.CopyNode"
+        }
+    }
+}

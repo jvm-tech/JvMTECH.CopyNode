@@ -1,0 +1,19 @@
+Neos:
+  Neos:
+#    fusion:
+#      autoInclude:
+#        JvMTECH.CopyNode: true
+
+    userInterface:
+      translation:
+        autoInclude:
+          JvMTECH.CopyNode: ['Modules']
+
+    modules:
+      management:
+        submodules:
+          copynode:
+            label: 'JvMTECH.CopyNode:Modules:module.label'
+            description: 'JvMTECH.CopyNode:Modules:module.description'
+            controller: 'JvMTECH\CopyNode\Controller\Module\CopyNodeController'
+            icon: 'far fa-copy'

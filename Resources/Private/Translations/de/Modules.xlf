@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file original="" product-name="JvMTECH.CopyNode" source-language="de" datatype="plaintext">
+        <body>
+            <trans-unit id="module.label" xml:space="preserve">
+                <source>Nodes Kopieren</source>
+            </trans-unit>
+            <trans-unit id="module.description" xml:space="preserve">
+                <source>Nodes rekursiv mit Dimensionen kopieren</source>
+            </trans-unit>
+            <trans-unit id="label" xml:space="preserve">
+                <source>Nodes Kopieren</source>
+            </trans-unit>
+            <trans-unit id="label.sourceIdentifier" xml:space="preserve">
+                <source>Identifikator des Dokumentknotens der kopiert werden soll</source>
+            </trans-unit>
+            <trans-unit id="label.targetIdentifier" xml:space="preserve">
+                <source>Identifikator des Dokumentknotens, an den der kopierte Knoten angehängt werden soll</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
