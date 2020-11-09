@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file original="" product-name="JvMTECH.CopyNode" source-language="de" datatype="plaintext">
+    <file original="" product-name="JvMTECH.CopyNode" source-language="en" datatype="plaintext">
         <body>
             <trans-unit id="module.label" xml:space="preserve">
-                <source>Nodes Kopieren</source>
+                <source>Copy Nodes</source>
             </trans-unit>
             <trans-unit id="module.description" xml:space="preserve">
-                <source>Nodes rekursiv mit Dimensionen kopieren</source>
+                <source>Copy nodes recursively with dimensions</source>
             </trans-unit>
             <trans-unit id="label" xml:space="preserve">
-                <source>Nodes Kopieren</source>
+                <source>Copy Nodes</source>
             </trans-unit>
             <trans-unit id="label.sourceIdentifier" xml:space="preserve">
-                <source>Identifier des Nodes der kopiert werden soll</source>
+                <source>Identifier of the node to be copied</source>
             </trans-unit>
             <trans-unit id="label.targetIdentifier" xml:space="preserve">
-                <source>Identifier des Nodes, in den der kopierte Node eingefügt werden soll</source>
+                <source>Identifier of the node into which the copied node is to be inserted</source>
             </trans-unit>
             <trans-unit id="button.submit" xml:space="preserve">
-                <source>Kopieren</source>
+                <source>Copy</source>
             </trans-unit>
 
             <trans-unit id="error.sourceNodeNotFound" xml:space="preserve">
-                <source>Zu kopierenden Node nicht gefunden</source>
+                <source>Node to be copied not found</source>
             </trans-unit>
             <trans-unit id="error.targetParentNodeNotFound" xml:space="preserve">
-                <source>Ziel Node nicht gefunden</source>
+                <source>Destination Node not found</source>
             </trans-unit>
             <trans-unit id="error.sourceNodeNotAllowedAsChildNode" xml:space="preserve">
-                <source>Der Typ des zu kopierenden Node ist nicht als Kindelement erlaubt</source>
+                <source>The type of the node to be copied is not allowed as child element</source>
             </trans-unit>
             <trans-unit id="error.copyFailed" xml:space="preserve">
-                <source>Beim Kopieren ist ein Fehler aufgetreten. Referenz "{0}"</source>
+                <source>An error occurred during copying. Reference "{0}"</source>
             </trans-unit>
             <trans-unit id="message.copied" xml:space="preserve">
-                <source>Der Node wurde kopiert</source>
+                <source>The node was copied</source>
             </trans-unit>
         </body>
     </file>

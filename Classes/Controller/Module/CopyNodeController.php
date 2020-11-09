@@ -1,21 +1,39 @@
 <?php
 namespace JvMTECH\CopyNode\Controller\Module;
 
-use Neos\ContentRepository\Domain\Service\NodeServiceInterface;
+/*
+ * This file is part of the JvMTECH.CopyNode package.
+ *
+ * (c) Contributors of the Neos Project - www.neos.io
+ *
+ * This package is Open Source Software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
+
 use Neos\Flow\Annotations as Flow;
+use Doctrine\DBAL;
+use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
+use Neos\ContentRepository\Domain\Service\NodeServiceInterface;
+use Neos\ContentRepository\Domain\Utility\NodePaths;
+use Neos\ContentRepository\Exception\NodeException;
+use Neos\Error\Messages\Message;
 use Neos\Flow\I18n;
 use Neos\Flow\Utility\Algorithms;
 use Neos\Neos\Controller\Module\AbstractModuleController;
-use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Neos\Neos\Service\UserService;
-use Doctrine\DBAL;
 
 /**
  * @Flow\Scope("singleton")
  */
 class CopyNodeController extends AbstractModuleController
 {
+
+    /**
+     * @var array
+     */
+    protected $identifiers = [];
 
     /**
      * @var array
@@ -75,45 +93,56 @@ class CopyNodeController extends AbstractModuleController
         $sourceNodeData = $this->nodeDataRepository->findOneByIdentifier($sourceIdentifier, $personalWorkspace, $dimensions);
         $targetNodeData = $this->nodeDataRepository->findOneByIdentifier($targetIdentifier, $personalWorkspace, $dimensions);
 
-        $nodeName = $this->nodeService->generateUniqueNodeName($targetNodeData->getPath());
-        $newParentPath = $targetNodeData->getPath();
-        $newPath = $newParentPath . '/' . $nodeName;
+        if ($sourceNodeData === null) {
+            $this->addFlashMessage($this->translate('error.sourceNodeNotFound'), 'Error', Message::SEVERITY_ERROR);
+        } else if ($targetNodeData === null) {
+            $this->addFlashMessage($this->translate('error.targetParentNodeNotFound'), 'Error', Message::SEVERITY_ERROR);
+        } else if (!$targetNodeData->getNodeType()->allowsChildNodeType($sourceNodeData->getNodeType())) {
+            $this->addFlashMessage($this->translate('error.sourceNodeNotAllowedAsChildNode'), 'Error', Message::SEVERITY_ERROR);
+        } else {
+            try {
+                $newParentPath = $targetNodeData->getPath();
+                $newNodeName = $this->nodeService->generateUniqueNodeName($newParentPath);
+                $newPath = $newParentPath . '/' . $newNodeName;
 
-        $config = new DBAL\Configuration();
-        $connection = DBAL\DriverManager::getConnection($this->backendOptions, $config);
-        $statement = "SELECT * FROM neos_contentrepository_domain_model_nodedata WHERE path LIKE '" . $sourceNodeData->getPath() . "%';";
-        $result = $connection->query($statement)->fetchAll();
+                $config = new DBAL\Configuration();
+                $connection = DBAL\DriverManager::getConnection($this->backendOptions, $config);
+                $statement = "SELECT * FROM neos_contentrepository_domain_model_nodedata WHERE path LIKE '" . $sourceNodeData->getPath() . "%';";
+                $result = $connection->query($statement)->fetchAll();
 
-        $nodeData = [];
+                $nodeData = [];
 
-        foreach ($result as $key => $value) {
-            $path = str_replace($sourceNodeData->getPath(), $newPath, $value['path']);
-            $parentpath = str_replace($sourceNodeData->getParentPath(), $newParentPath, $value['parentpath']);
+                foreach ($result as $key => $value) {
+                    $path = str_replace($sourceNodeData->getPath(), $newPath, $value['path']);
+                    $parentpath = NodePaths::getParentPath($path);
 
-            $nodeData[$key] = $value;
-            $nodeData[$key]['persistence_object_identifier'] = Algorithms::generateUUID();
-            $nodeData[$key]['identifier'] = Algorithms::generateUUID(); // ToDo: Same identifier for node variants
-            $nodeData[$key]['path'] = $path;
-            $nodeData[$key]['pathhash'] = md5($path);
-            $nodeData[$key]['parentpath'] = $parentpath;
-            $nodeData[$key]['parentpathhash'] = md5($parentpath);
+                    $nodeData[$key] = $value;
+                    $nodeData[$key]['persistence_object_identifier'] = Algorithms::generateUUID();
+                    $nodeData[$key]['workspace'] = $personalWorkspace->getName();
+                    $nodeData[$key]['path'] = $path;
+                    $nodeData[$key]['pathhash'] = md5($path);
+                    $nodeData[$key]['parentpath'] = $parentpath;
+                    $nodeData[$key]['parentpathhash'] = md5($parentpath);
+
+                    if (!array_key_exists($value['identifier'], $this->identifiers)) {
+                        $this->identifiers[$value['identifier']] = Algorithms::generateUUID();
+                    }
+                    $nodeData[$key]['identifier'] = $this->identifiers[$value['identifier']];
+                }
+
+                foreach ($nodeData as $values) {
+                    $connection->insert('neos_contentrepository_domain_model_nodedata', $values);
+                }
+
+                $connection->close();
+                $this->addFlashMessage($this->translate('message.copied'), 'Success');
+            } catch (NodeException $e) {
+                $this->addFlashMessage($this->translate('error.copyFailed', [$e->getReferenceCode()]), 'Error', Message::SEVERITY_ERROR);
+            }
         }
-
-        foreach ($nodeData as $values) {
-            $connection->insert('neos_contentrepository_domain_model_nodedata', $values);
-        }
-
-        $connection->close();
 
         $this->redirect('index');
     }
-
-    /**
-     * @param string $id
-     * @param array $arguments
-     * @return string
-     */
-
 
     /**
      * @param string $id
