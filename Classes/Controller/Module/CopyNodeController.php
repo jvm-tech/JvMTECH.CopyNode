@@ -111,6 +111,7 @@ class CopyNodeController extends AbstractModuleController
                 $result = $connection->query($statement)->fetchAll();
 
                 $nodeData = [];
+                $nodeDimension = [];
 
                 foreach ($result as $key => $value) {
                     $path = str_replace($sourceNodeData->getPath(), $newPath, $value['path']);
@@ -128,11 +129,29 @@ class CopyNodeController extends AbstractModuleController
                         $this->identifiers[$value['identifier']] = Algorithms::generateUUID();
                     }
                     $nodeData[$key]['identifier'] = $this->identifiers[$value['identifier']];
+
+                    $dimensionValues = json_decode($value['dimensionvalues'], true);
+                    foreach ($dimensionValues as $dimensionName => $dimensionValue) {
+                        $nodeDimension[] = [
+                            'persistence_object_identifier' => Algorithms::generateUUID(),
+                            'nodedata' => $nodeData[$key]['persistence_object_identifier'],
+                            'name' => $dimensionName,
+                            'value' => $dimensionValue[0]
+                        ];
+                    }
                 }
+
+                $connection->beginTransaction();
 
                 foreach ($nodeData as $values) {
                     $connection->insert('neos_contentrepository_domain_model_nodedata', $values);
                 }
+
+                foreach ($nodeDimension as $values) {
+                    $connection->insert('neos_contentrepository_domain_model_nodedimension', $values);
+                }
+
+                $connection->commit();
 
                 $connection->close();
                 $this->addFlashMessage($this->translate('message.copied'), 'Success');
