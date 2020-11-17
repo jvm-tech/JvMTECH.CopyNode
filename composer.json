@@ -8,6 +8,9 @@
             "email": "samuel.hauser@gmail.com"
         }
     ],
+    "require": {
+        "neos/neos": "*"
+    },
     "autoload": {
         "psr-4": {
             "JvMTECH\\CopyNode\\": "Classes/"
