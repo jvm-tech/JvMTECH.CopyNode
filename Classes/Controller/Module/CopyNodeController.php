@@ -130,6 +130,28 @@ class CopyNodeController extends AbstractModuleController
                     }
                     $nodeData[$key]['identifier'] = $this->identifiers[$value['identifier']];
 
+                    // Rename the uri path segment if needed
+                    if ($parentpath === $targetNodeData->getPath()) {
+                        $properties = json_decode($nodeData[$key]['properties'], true);
+
+                        $siblingsStatement = "SELECT properties FROM neos_contentrepository_domain_model_nodedata WHERE parentpath = '" . $sourceNodeData->getParentPath() . "';";
+                        $siblingsResult = $connection->query($siblingsStatement)->fetchAll();
+                        $siblingsUriPathSegments = array_map(function ($item) {
+                            $json = json_decode($item['properties'], true);
+                            return $json && array_key_exists('uriPathSegment', $json) ? $json['uriPathSegment'] : '';
+                        }, $siblingsResult);
+
+                        $possibleUriPathSegment = $initialUriPathSegment = $properties['uriPathSegment'];
+                        $i = 1;
+                        while (in_array($possibleUriPathSegment, $siblingsUriPathSegments)) {
+                            $possibleUriPathSegment = $initialUriPathSegment . '-' . $i++;
+                        }
+
+                        $properties['uriPathSegment'] = $possibleUriPathSegment;
+                        $nodeData[$key]['properties'] = json_encode($properties);
+                    }
+
+                    // Save node dimensions
                     $dimensionValues = json_decode($value['dimensionvalues'], true);
                     foreach ($dimensionValues as $dimensionName => $dimensionValue) {
                         $nodeDimension[] = [
