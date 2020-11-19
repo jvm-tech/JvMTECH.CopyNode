@@ -4,7 +4,7 @@ namespace JvMTECH\CopyNode\Controller\Module;
 /*
  * This file is part of the JvMTECH.CopyNode package.
  *
- * (c) Contributors of the Neos Project - www.neos.io
+ * Copyright (c) 2020 Jung von Matt TECH AG, Switzerland
  *
  * This package is Open Source Software. For the full copyright and license
  * information, please view the LICENSE file which was distributed with this
