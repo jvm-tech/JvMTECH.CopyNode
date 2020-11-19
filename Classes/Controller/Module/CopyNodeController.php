@@ -113,6 +113,17 @@ class CopyNodeController extends AbstractModuleController
                 $nodeData = [];
                 $nodeDimension = [];
 
+                // Load existing target sibling uri path segments and sorting indexes
+                $siblingsStatement = "SELECT properties, sortingindex FROM neos_contentrepository_domain_model_nodedata WHERE parentpath = '" . $targetNodeData->getPath() . "';";
+                $siblingsResult = $connection->query($siblingsStatement)->fetchAll();
+                $largestSortingIndex = 0;
+                $siblingsUriPathSegments = array_map(function ($item) use (&$largestSortingIndex) {
+                    $largestSortingIndex = max($largestSortingIndex, $item['sortingindex'] * 1);
+
+                    $json = json_decode($item['properties'], true);
+                    return $json && array_key_exists('uriPathSegment', $json) ? $json['uriPathSegment'] : '';
+                }, $siblingsResult);
+
                 foreach ($result as $key => $value) {
                     $path = str_replace($sourceNodeData->getPath(), $newPath, $value['path']);
                     $parentpath = NodePaths::getParentPath($path);
@@ -125,41 +136,41 @@ class CopyNodeController extends AbstractModuleController
                     $nodeData[$key]['parentpath'] = $parentpath;
                     $nodeData[$key]['parentpathhash'] = md5($parentpath);
 
+                    // Set the new identifier
                     if (!array_key_exists($value['identifier'], $this->identifiers)) {
                         $this->identifiers[$value['identifier']] = Algorithms::generateUUID();
                     }
                     $nodeData[$key]['identifier'] = $this->identifiers[$value['identifier']];
 
-                    // Rename the uri path segment if needed
+                    // Rename the uri path segment of the copied root node
                     if ($parentpath === $targetNodeData->getPath()) {
+                        $nodeData[$key]['sortingindex'] = $largestSortingIndex + 50;
+
                         $properties = json_decode($nodeData[$key]['properties'], true);
+                        if (array_key_exists('uriPathSegment', $properties)) {
+                            $possibleUriPathSegment = $initialUriPathSegment = $properties['uriPathSegment'];
 
-                        $siblingsStatement = "SELECT properties FROM neos_contentrepository_domain_model_nodedata WHERE parentpath = '" . $sourceNodeData->getParentPath() . "';";
-                        $siblingsResult = $connection->query($siblingsStatement)->fetchAll();
-                        $siblingsUriPathSegments = array_map(function ($item) {
-                            $json = json_decode($item['properties'], true);
-                            return $json && array_key_exists('uriPathSegment', $json) ? $json['uriPathSegment'] : '';
-                        }, $siblingsResult);
+                            $i = 1;
+                            while (in_array($possibleUriPathSegment, $siblingsUriPathSegments)) {
+                                $possibleUriPathSegment = $initialUriPathSegment . '-' . $i++;
+                            }
 
-                        $possibleUriPathSegment = $initialUriPathSegment = $properties['uriPathSegment'];
-                        $i = 1;
-                        while (in_array($possibleUriPathSegment, $siblingsUriPathSegments)) {
-                            $possibleUriPathSegment = $initialUriPathSegment . '-' . $i++;
+                            $properties['uriPathSegment'] = $possibleUriPathSegment;
+                            $nodeData[$key]['properties'] = json_encode($properties);
                         }
-
-                        $properties['uriPathSegment'] = $possibleUriPathSegment;
-                        $nodeData[$key]['properties'] = json_encode($properties);
                     }
 
                     // Save node dimensions
                     $dimensionValues = json_decode($value['dimensionvalues'], true);
-                    foreach ($dimensionValues as $dimensionName => $dimensionValue) {
-                        $nodeDimension[] = [
-                            'persistence_object_identifier' => Algorithms::generateUUID(),
-                            'nodedata' => $nodeData[$key]['persistence_object_identifier'],
-                            'name' => $dimensionName,
-                            'value' => $dimensionValue[0]
-                        ];
+                    if (is_array($dimensionValues)) {
+                        foreach ($dimensionValues as $dimensionName => $dimensionValue) {
+                            $nodeDimension[] = [
+                                'persistence_object_identifier' => Algorithms::generateUUID(),
+                                'nodedata' => $nodeData[$key]['persistence_object_identifier'],
+                                'name' => $dimensionName,
+                                'value' => $dimensionValue[0]
+                            ];
+                        }
                     }
                 }
 
