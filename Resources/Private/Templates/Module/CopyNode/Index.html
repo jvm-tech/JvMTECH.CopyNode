@@ -21,6 +21,16 @@
             <f:render partial="Module/Shared/FieldValidationResults" arguments="{fieldname: 'targetIdentifier'}"/>
           </div>
         </div>
+
+        <div class="neos-control-group">
+            <label class="neos-control-label"><neos:backend.translate id="label.flushCache" source="Modules" /></label>
+            <div class="neos-controls">
+                <label for="flushCache" class="neos-checkbox">
+                    <f:form.checkbox name="flushCache" value="1" id="flushCache" checked="true" /><span></span>
+                    {cacheNames}
+                </label>
+            </div>
+        </div>
       </fieldset>
     </div>
 

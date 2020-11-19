@@ -17,6 +17,9 @@
             <trans-unit id="label.targetIdentifier" xml:space="preserve">
                 <source>Identifier of the node into which the copied node is to be inserted</source>
             </trans-unit>
+            <trans-unit id="label.flushCache" xml:space="preserve">
+                <source>Flush caches</source>
+            </trans-unit>
             <trans-unit id="button.submit" xml:space="preserve">
                 <source>Copy</source>
             </trans-unit>

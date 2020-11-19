@@ -18,6 +18,7 @@ use Neos\ContentRepository\Domain\Service\NodeServiceInterface;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
 use Neos\ContentRepository\Exception\NodeException;
 use Neos\Error\Messages\Message;
+use Neos\Flow\Cache\CacheManager;
 use Neos\Flow\I18n;
 use Neos\Flow\Utility\Algorithms;
 use Neos\Neos\Controller\Module\AbstractModuleController;
@@ -71,15 +72,29 @@ class CopyNodeController extends AbstractModuleController
      */
     protected $translator;
 
+    /**
+     * @Flow\Inject
+     * @var CacheManager
+     */
+    protected $cacheManager;
+
+    /**
+     * @Flow\InjectConfiguration(path="caches")
+     * @var array
+     */
+    protected $cacheConfiguration;
+
     public function indexAction()
     {
+        $this->view->assign('cacheNames', implode(', ', $this->cacheConfiguration));
     }
 
     /**
      * @param string $sourceIdentifier
-     * @param string $targetParentIdentifier
+     * @param string $targetIdentifier
+     * @param bool $flushCache
      */
-    public function copyNodeAction(string $sourceIdentifier, string $targetIdentifier)
+    public function copyNodeAction(string $sourceIdentifier, string $targetIdentifier, $flushCache = false)
     {
         $personalWorkspace = $this->userService->getPersonalWorkspace();
 
@@ -187,6 +202,13 @@ class CopyNodeController extends AbstractModuleController
                 $connection->commit();
 
                 $connection->close();
+
+                if ($flushCache) {
+                    foreach ($this->cacheConfiguration as $cacheIdentifier) {
+                        $this->cacheManager->getCache($cacheIdentifier)->flush();
+                    }
+                }
+
                 $this->addFlashMessage($this->translate('message.copied'), 'Success');
             } catch (NodeException $e) {
                 $this->addFlashMessage($this->translate('error.copyFailed', [$e->getReferenceCode()]), 'Error', Message::SEVERITY_ERROR);

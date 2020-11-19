@@ -17,3 +17,8 @@ Neos:
             description: 'JvMTECH.CopyNode:Modules:module.description'
             controller: 'JvMTECH\CopyNode\Controller\Module\CopyNodeController'
             icon: 'far fa-copy'
+
+JvMTECH:
+  CopyNode:
+    caches:
+      - 'Neos_Fusion_Content'
