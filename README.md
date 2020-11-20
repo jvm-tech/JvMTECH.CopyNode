@@ -2,7 +2,7 @@
 [![Latest Stable Version](https://poser.pugx.org/jvmtech/copynode/v/stable)](https://packagist.org/packages/jvmtech/copynode)
 [![License](https://poser.pugx.org/jvmtech/copynode/license)](https://packagist.org/packages/jvmtech/copynode)
 
-Recursive copies of DocumentNodes including dimensions for Neos CMS
+Recursive copies of Document- and ContentNodes including dimensions for Neos CMS
 
 ## Installation
 ```

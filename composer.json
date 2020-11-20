@@ -1,11 +1,15 @@
 {
     "name": "jvmtech/copynode",
-    "description": "Copy nodes recursive with dimensions",
+    "description": "Recursive copies of Document- and ContentNodes including dimensions for Neos CMS",
     "type": "neos-package",
     "authors": [
         {
             "name": "Samuel Hauser",
             "email": "samuel.hauser@gmail.com"
+        },
+        {
+            "name": "Stefan Bruggmann",
+            "homepage": "https://twitter.com/sbruggm4nn"
         }
     ],
     "require": {
