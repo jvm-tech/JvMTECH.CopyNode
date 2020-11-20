@@ -2,6 +2,7 @@
     "name": "jvmtech/copynode",
     "description": "Recursive copies of Document- and ContentNodes including dimensions for Neos CMS",
     "type": "neos-package",
+    "license": "MIT",
     "authors": [
         {
             "name": "Samuel Hauser",
